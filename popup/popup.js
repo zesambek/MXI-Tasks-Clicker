@@ -22,11 +22,24 @@ function loadAChecksPage() {
     fetch('../achecks/achecks.html')
         .then(response => response.text())
         .then(html => {
-            document.getElementById('mainContent').innerHTML = html;
-            // Reapply the script for the loaded page
+            // Insert the A Checks HTML into the popup and add a class to scope the styles
+            const mainContent = document.getElementById('mainContent');
+            mainContent.classList.add('a-checks-content'); // Add a class for scoping
+            mainContent.innerHTML = html;
+
+            // Dynamically load the A Checks JavaScript file
             const script = document.createElement('script');
             script.src = '../achecks/achecks.js';
             document.body.appendChild(script);
+
+            // Check if the stylesheet is already loaded to avoid duplicates
+            if (!document.querySelector('link[href="../achecks/achecks.css"]')) {
+                // Dynamically load the A Checks CSS file
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = '../achecks/achecks.css';
+                document.head.appendChild(link);
+            }
         })
         .catch(error => console.error('Error loading A Checks page:', error));
 }

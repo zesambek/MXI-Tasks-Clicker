@@ -6,10 +6,12 @@
   "action": {
     "default_popup": "popup/popup.html"
   },
+  "devtools_page": "devtools/devtools.html",
   "background": {
     "service_worker": "background.js"
   },
-  "content_scripts": [
+  
+   "content_scripts": [
     {
       "matches": ["http://etmxi.ethiopianairlines.com/maintenix/web/inventory/InventoryDetails.jsp*"],
       "js": ["content-scripts/content-script.js"]
