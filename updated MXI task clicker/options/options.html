@@ -3,14 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Input Form</title>
+    <title>Enhanced Check Type Manager</title>
+    <!-- Link to options.css -->
     <link rel="stylesheet" href="options.css">
 </head>
 <body>
-    <h1>Dynamic Input Form</h1>
-    <div id="input-container"></div>
-    <button id="save-btn" type="button">Save Configuration</button>
-    <button id="add-check-type-btn" type="button">Add Check Type</button>
-    <script src="options.js"></script>
+    <h1>Enhanced Check Type Manager</h1>
+
+    <div>
+        <label for="check-type-name">Check Type Name:</label>
+        <input type="text" id="check-type-name" placeholder="Enter check type name">
+        <button id="add-check-type">Add Check Type</button>
+    </div>
+
+    <ul id="check-type-list"></ul>
+
+    <div id="parameters-section" style="display:none;">
+        <h2>Manage Parameters for <span id="current-check-type"></span></h2>
+
+        <div>
+            <label for="param-name">Parameter Name:</label>
+            <input type="text" id="param-name" placeholder="Enter parameter name">
+
+            <label for="param-type">Parameter Type:</label>
+            <select id="param-type">
+                <option value="string">String</option>
+                <option value="number">Number</option>
+                <option value="boolean">Boolean</option>
+            </select>
+
+            <label for="param-value">Parameter Value:</label>
+            <input type="text" id="param-value" placeholder="Enter parameter value">
+
+            <label for="param-required">Required:</label>
+            <input type="checkbox" id="param-required">
+
+            <button id="add-param">Add Parameter</button>
+        </div>
+
+        <ul id="param-list"></ul>
+    </div>
 </body>
+<script src="options.js"></script>
 </html>
+

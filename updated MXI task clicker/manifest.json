@@ -2,6 +2,19 @@
   "manifest_version": 3,
   "name": "MXI Tasks Clicker",
   "version": "1.0",
+  "icons": {
+    "48": "images/icon.png",
+    "128": "images/icon.png"
+  },
+  "action": {
+    "default_icon": {             
+      "16": "images/icon.png",  
+      "24": "images/icon.png",  
+      "32": "images/icon.png"  
+    },
+    "default_title": "MXI Tasks Clicker",
+    "default_popup": "popup/popup.html"
+  },
   "options_page" : "options/options.html",
   "permissions": ["tabs","activeTab","scripting","storage"],
   "background": {

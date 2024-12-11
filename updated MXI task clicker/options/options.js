@@ -1,94 +1,201 @@
-// Step 1: Define the CheckType class
+// JavaScript for managing check types and parameters with Chrome Storage Sync
 class CheckType {
     constructor(name) {
-        this.name = name; // Name of the check type
-        this.parameters = {}; // Initialize an empty parameters object
+        this.name = name;
+        this.parameters = {};
     }
 
-    // Step 2: Method to add or update a parameter
-    addOrUpdateParameter(paramName, paramValue, paramType = null, isRequired = true) {
-        if (!paramName || typeof paramName !== "string") {
-            throw new Error("Parameter name must be a non-empty string.");
-        }
-
-        // Determine the type dynamically if not explicitly provided
-        const valueType = paramType || typeof paramValue;
-
-        // Add or update the parameter
+    addOrUpdateParameter(paramName, paramType, paramValue, required) {
+        const parsedValue = this.parseValue(paramType, paramValue);
         this.parameters[paramName] = {
-            type: valueType,
-            value: paramValue,
-            required: isRequired
+            type: paramType,
+            value: parsedValue,
+            required: required,
         };
     }
 
-    // Method to get the value of a parameter
-    getParameterValue(paramName) {
-        return this.parameters[paramName] ? this.parameters[paramName].value : undefined;
-    }
-
-    // Method to update only the value of an existing parameter
-    updateParameterValue(paramName, newValue) {
-        if (this.parameters[paramName]) {
-            this.parameters[paramName].value = newValue;
-            this.parameters[paramName].type = typeof newValue; // Update type if necessary
-        } else {
-            throw new Error(`Parameter '${paramName}' does not exist.`);
-        }
-    }
-
-    // Method to remove a parameter
     removeParameter(paramName) {
-        if (this.parameters[paramName]) {
-            delete this.parameters[paramName];
-        } else {
-            throw new Error(`Parameter '${paramName}' does not exist.`);
+        delete this.parameters[paramName];
+    }
+
+    listParameters() {
+        return Object.entries(this.parameters).map(([key, param]) => ({
+            name: key,
+            ...param,
+        }));
+    }
+
+    parseValue(paramType, paramValue) {
+        switch (paramType) {
+            case "number":
+                return parseFloat(paramValue);
+            case "boolean":
+                return paramValue.toLowerCase() === "true";
+            default:
+                return paramValue;
         }
     }
 
-    // Method to list all parameters with their types and values
-    listParameters() {
-        return Object.entries(this.parameters).map(([key, { type, value, required }]) => ({
-            name: key,
-            type: type,
-            value: value,
-            required: required
-        }));
+    toJSON() {
+        return {
+            name: this.name,
+            parameters: this.parameters,
+        };
+    }
+
+    static fromJSON(json) {
+        const instance = new CheckType(json.name);
+        instance.parameters = json.parameters;
+        return instance;
     }
 }
 
-// Step 3: Create instances of CheckType
-const checkType1 = new CheckType("CheckType1");
-checkType1.addOrUpdateParameter("Parameter1", "Default Value"); // string
-checkType1.addOrUpdateParameter("Parameter2", 42);             // number
+// App data
+const checkTypes = {};
 
-const checkType2 = new CheckType("CheckType2");
-checkType2.addOrUpdateParameter("ParameterA", "Another Value"); // string
-checkType2.addOrUpdateParameter("ParameterB", 100);             // number
+// DOM elements
+const addBtn = document.getElementById("add-check-type");
+const checkTypeNameInput = document.getElementById("check-type-name");
+const checkTypeList = document.getElementById("check-type-list");
+const parametersSection = document.getElementById("parameters-section");
+const currentCheckTypeSpan = document.getElementById("current-check-type");
+const paramNameInput = document.getElementById("param-name");
+const paramTypeSelect = document.getElementById("param-type");
+const paramValueInput = document.getElementById("param-value");
+const paramRequiredInput = document.getElementById("param-required");
+const addParamBtn = document.getElementById("add-param");
+const paramList = document.getElementById("param-list");
 
-// Adding a new check type '1A'
-const checkType1A = new CheckType("1A");
-checkType1A.addOrUpdateParameter("ParamX", "Value for ParamX"); // string
-checkType1A.addOrUpdateParameter("ParamY", 10);                 // number
-checkType1A.addOrUpdateParameter("ParamZ", false);              // boolean
+// Current check type being managed
+let currentCheckType = null;
 
-// Accessing parameters
-console.log(checkType1.parameters); // Outputs parameters of CheckType1
-console.log(checkType1A.getParameterValue("ParamX")); // Outputs: Value for ParamX
+// Save all check types to sync storage
+function saveToStorage() {
+    const data = Object.fromEntries(
+        Object.entries(checkTypes).map(([key, value]) => [key, value.toJSON()])
+    );
+    chrome.storage.sync.set({ checkTypes: data });
+}
 
-// Updating a parameter value
-checkType1.updateParameterValue("Parameter1", "Updated Value");
-console.log(checkType1.getParameterValue("Parameter1")); // Outputs: Updated Value
+// Load all check types from sync storage
+function loadFromStorage() {
+    chrome.storage.sync.get("checkTypes", (result) => {
+        if (result.checkTypes) {
+            Object.entries(result.checkTypes).forEach(([key, value]) => {
+                const checkType = CheckType.fromJSON(value);
+                checkTypes[key] = checkType;
+                addCheckTypeToUI(checkType);
+            });
+        }
+    });
+}
 
-// Removing a parameter
-checkType1.removeParameter("Parameter2");
-console.log(checkType1.parameters); // Outputs parameters without Parameter2
+// Add a new check type
+addBtn.addEventListener("click", () => {
+    const name = checkTypeNameInput.value.trim();
+    if (!name) {
+        alert("Please enter a valid check type name.");
+        return;
+    }
 
-// Listing all parameters in CheckType1
-console.log(checkType1.listParameters()); 
+    if (checkTypes[name]) {
+        alert("Check type already exists.");
+        return;
+    }
 
-// Output all check types
-console.log(checkType1);
-console.log(checkType2);
-console.log(checkType1A);
+    // Create a new CheckType instance
+    const newCheckType = new CheckType(name);
+    checkTypes[name] = newCheckType;
+
+    // Update the UI
+    addCheckTypeToUI(newCheckType);
+
+    // Save to storage
+    saveToStorage();
+
+    // Clear the input field
+    checkTypeNameInput.value = "";
+});
+
+// Add check type to UI
+function addCheckTypeToUI(checkType) {
+    const listItem = document.createElement("li");
+    listItem.textContent = `Check Type: ${checkType.name}`;
+    listItem.id = `check-type-${checkType.name}`;
+
+    const manageBtn = document.createElement("button");
+    manageBtn.textContent = "Manage";
+    manageBtn.addEventListener("click", () => {
+        currentCheckType = checkType;
+        currentCheckTypeSpan.textContent = checkType.name;
+        updateParameterList();
+        parametersSection.style.display = "block";
+    });
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+    deleteBtn.addEventListener("click", () => {
+        delete checkTypes[checkType.name];
+        checkTypeList.removeChild(listItem);
+        if (currentCheckType === checkType) {
+            parametersSection.style.display = "none";
+            currentCheckType = null;
+        }
+        saveToStorage();
+    });
+
+    listItem.appendChild(manageBtn);
+    listItem.appendChild(deleteBtn);
+    checkTypeList.appendChild(listItem);
+}
+
+// Add a new parameter
+addParamBtn.addEventListener("click", () => {
+    if (!currentCheckType) return;
+
+    const paramName = paramNameInput.value.trim();
+    const paramType = paramTypeSelect.value;
+    const paramValue = paramValueInput.value.trim();
+    const required = paramRequiredInput.checked;
+
+    if (!paramName) {
+        alert("Please enter a valid parameter name.");
+        return;
+    }
+
+    // Add or update the parameter in the current check type
+    currentCheckType.addOrUpdateParameter(paramName, paramType, paramValue, required);
+    updateParameterList();
+
+    // Save to storage
+    saveToStorage();
+
+    // Clear parameter input fields
+    paramNameInput.value = "";
+    paramValueInput.value = "";
+    paramRequiredInput.checked = false;
+});
+
+// Update the parameter list in the UI
+function updateParameterList() {
+    paramList.innerHTML = "";
+    const parameters = currentCheckType.listParameters();
+
+    parameters.forEach(({ name, type, value, required }) => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `Name: ${name}, Type: ${type}, Value: ${value}, Required: ${required}`;
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "Remove";
+        removeBtn.addEventListener("click", () => {
+            currentCheckType.removeParameter(name);
+            updateParameterList();
+            saveToStorage();
+        });
+        listItem.appendChild(removeBtn);
+        paramList.appendChild(listItem);
+    });
+}
+
+// Initialize the app by loading stored data
+document.addEventListener("DOMContentLoaded", loadFromStorage);
 

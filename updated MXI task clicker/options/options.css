@@ -1,104 +1,207 @@
+/* Deeply Refined Styling for Chrome Extension Options Page */
+
+/* Root Variables for Consistent Theming */
+:root {
+  --primary-color: #4CAF50;
+  --secondary-color: #ffffff;
+  --background-color: #f9fafb;
+  --border-color: #e0e0e0;
+  --hover-color: #388E3C;
+  --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --transition-speed: 0.3s;
+  --focus-shadow-color: rgba(76, 175, 80, 0.4);
+}
+
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Body Styles */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
-    margin: 0;
-    padding: 20px;
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  background-color: var(--background-color);
+  color: #333;
+  line-height: 1.6;
 }
 
-h1 {
-    text-align: center;
-    color: #333;
+h1, h2 {
+  color: var(--primary-color);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-#input-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+/* Container Styles */
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  background: var(--secondary-color);
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  transition: transform var(--transition-speed);
 }
 
+.container:hover {
+  transform: scale(1.02);
+}
+
+/* Input Group Styling */
 .input-group {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  transition: background-color var(--transition-speed);
 }
 
-.input-item {
-    flex: 1;
-    margin-right: 10px;
+.input-group:hover {
+  background-color: rgba(76, 175, 80, 0.05); /* Subtle hover effect */
 }
 
-.input-item:last-child {
-    margin-right: 0; /* No margin for the last item */
+.input-group label {
+  flex: 0 0 130px;
+  font-weight: bold;
+  color: var(--primary-color);
+  text-align: right;
+  transition: transform var(--transition-speed); /* Animation on focus */
 }
 
-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+.input-group input,
+.input-group select {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+  background-color: #fff; /* Ensuring consistent background */
 }
 
-.dynamic-input,
-.dynamic-select {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    transition: border-color 0.3s ease-in-out; /* Smooth transition */
+/* Focus State Enhancements */
+.input-group input:focus,
+.input-group select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 8px var(--focus-shadow-color);
+  outline: none; /* Removing default outline */
 }
 
-.dynamic-input:focus,
-.dynamic-select:focus {
-    border-color: #66afe9; /* Focus state */
-    outline: none; /* Remove default outline */
+/* Placeholder Styling */
+.input-group input::placeholder,
+.input-group select::placeholder {
+  color: rgba(0, 0, 0, 0.5); /* Light color for placeholders */
+  opacity: 1; /* Ensuring visibility */
 }
 
+/* Button Styling */
 button {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff; /* Primary button color */
-    color: white;
-    cursor: pointer;
-    transition: background-color 0.3s; /* Transition effect */
+  background: linear-gradient(to bottom right, var(--primary-color), var(--hover-color));
+  color: var(--secondary-color);
+  border: none;
+  padding: 0.8rem 1.8rem;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color var(--transition-speed), transform 0.2s;
 }
 
 button:hover {
-    background-color: #0056b3; /* Darker blue on hover */
+  background: var(--hover-color);
+  transform: translateY(-2px);
 }
 
-.highlight {
-    background-color: #ffcccc; /* Light red background for highlighting */
-    border: 1px solid #ff0000; /* Red border for visibility */
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
 }
 
-.remove-btn {
-    background-color: #dc3545; /* Bootstrap danger color */
+/* Dynamic List Styling */
+.dynamic-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
-.remove-btn:hover {
-    background-color: #c82333; /* Darker red on hover */
+.dynamic-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.7rem 1rem;
+  margin-bottom: 0.8rem;
+  background: var(--secondary-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  transition: background-color var(--transition-speed), transform var(--transition-speed);
+}
+
+/* Hover Effects for List Items */
+.dynamic-list li:hover {
+  background: #eef7ee;
+  transform: scale(1.01); /* Subtle scaling effect */
+}
+
+.dynamic-list .parameter-details {
+  flex: 1;
+  margin-right: 1rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* Button within List Items */
+.dynamic-list button {
+  margin-left: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: var(--primary-color); /* Ensuring buttons match theme */
+  color: var(--secondary-color);
+  border: none;
+  border-radius: 4px; /* Slightly smaller radius */
+  cursor: pointer;
+  transition: background var(--transition-speed), transform var(--transition-speed);
+}
+
+.dynamic-list button:hover {
+  background: var(--hover-color);
+  transform: translateY(-1px); /* Slight lift on hover */
+}
+
+.dynamic-list button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Footer Styling */
+footer {
+  text-align: center;
+  margin-top: 2rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+footer a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color var(--transition-speed);
+}
+
+footer a:hover {
+  color: var(--hover-color);
 }
 
 /* Responsive Design */
 @media (max-width: 600px) {
-    .input-group {
-        flex-direction: column; /* Stack items vertically on small screens */
-        gap: 10px; /* Space between stacked items */
-    }
+  .input-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
-    .input-item {
-        margin-right: 0; /* Reset margin for smaller screens */
-        margin-bottom: 10px; /* Add space between items */
-    }
+  .input-group label {
+    text-align: left;
+  }
 }
 
-/* Error Message Style */
-.error-message {
-    color: #dc3545; /* Bootstrap danger color */
-    font-size: 0.9em; /* Slightly smaller font size */
-}
